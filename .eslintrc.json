@@ -1,0 +1,124 @@
+{
+  "extends": ["airbnb-base", "airbnb-typescript/base", "plugin:prettier/recommended", "plugin:eslint-comments/recommended", "plugin:sonarjs/recommended","next/core-web-vitals"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "sonarjs"],
+  "root": true,
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./test/tsconfig.json"]
+  },
+  "ignorePatterns": [
+    "jest.config.cjs",
+    "jest-stackblitz.config.cjs",
+    "docs/*",
+    "*.json"
+  ],
+  "rules": {
+    "@typescript-eslint/quotes": ["error", "double"],
+    "@typescript-eslint/parameter-properties": [
+      "error",
+      {
+        "allow": [
+          "public",
+          "private",
+          "private readonly",
+          "public readonly",
+          "protected",
+          "protected readonly"
+        ]
+      }
+    ],
+    "@typescript-eslint/consistent-indexed-object-style": "off",
+    "import/prefer-default-export": "off",
+    "object-shorthand": "off",
+    "max-classes-per-file": ["error", 6],
+    "@typescript-eslint/no-magic-numbers": "off",
+    "class-methods-use-this": "off",
+    "@typescript-eslint/return-await": ["error", "always"],
+    "import/no-import-module-exports": "off",
+    // When overriding methods, this forces us to remove them, even though it is a good pattern
+    // to still declare args of overriden methods
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "args": "none"
+    }],
+    "import/order": [
+      "error",
+      {
+      "newlines-between": "always"
+      }
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "eslint-comments/no-unused-disable": ["error"],
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-base-to-string": "error",
+    "@typescript-eslint/strict-boolean-expressions": "error",
+    "@typescript-eslint/no-unsafe-argument": "error",
+    "@typescript-eslint/consistent-type-assertions": ["error", {
+      "assertionStyle": "never"
+    }],
+    "no-plusplus": [
+      "error",
+      {
+      "allowForLoopAfterthoughts": true
+      }
+    ],
+    "@typescript-eslint/no-use-before-define": ["error", {
+      "ignoreTypeReferences": true
+    }],
+    "no-undef-init": "off",
+    // Only to enforce comments length, code will be checked by prettier
+    "max-len": ["error", 1000, {
+      "comments": 100,
+      "ignoreComments": false,
+      "ignoreUrls": true,
+      "ignoreStrings": true
+    }],
+    "sonarjs/cognitive-complexity": [
+      "error",
+      13
+    ],
+    "no-restricted-syntax": "off",
+    "no-void": ["error", {
+      "allowAsStatement": true
+    }],
+    // Introduce at some point in the future
+//    "@typescript-eslint/explicit-function-return-type": "error",
+    // Reenable again
+    "sonarjs/no-duplicate-string": "off",
+    // Handled by prettier
+    "@typescript-eslint/indent": ["off"],
+    "@typescript-eslint/no-floating-promises": "error",
+    "no-else-return": "off",
+    "no-bitwise": "off"
+  },
+
+  "overrides": [
+    {
+      "files": ["*.test.ts", "**/test/**/*.ts"],
+      "rules": {
+        "no-console": "off",
+        "import/no-extraneous-dependencies": "off",
+        "@typescript-eslint/init-declarations": "off",
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "no-await-in-loop": "off",
+        "no-plusplus": "off"
+      }
+    },
+    {
+      "files": ["index.ts"],
+      "rules": {}
+    },
+    {
+      "files": ["cli.ts"],
+      "rules": {
+        // Disable this because of the comment shell thingy in cli.tsx
+        "max-len": "off"
+      }
+    }
+  ]
+
+}
