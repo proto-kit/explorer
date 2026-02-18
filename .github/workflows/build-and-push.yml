@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build-and-push:
@@ -32,8 +32,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable={{eq .Ref "refs/heads/main"}}
             type=sha
+            type=ref,event=branch
 
       - name: Build and push image
         uses: docker/build-push-action@v5
