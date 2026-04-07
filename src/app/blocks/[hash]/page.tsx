@@ -9,6 +9,7 @@ import config from "@/config";
 import { typed } from "@/lib/utils";
 import {
   columns,
+  statusRenderer,
   TableItem,
 } from "@/components/transactions/TransactionsPageClient";
 
@@ -108,7 +109,7 @@ export default function BlockDetail() {
         isSuccess: tx.status === true,
         message: tx.statusMessage,
       },
-    })
+    }),
   );
 
   return (
@@ -130,6 +131,7 @@ export default function BlockDetail() {
         loading={loading}
         navigationPath="/transactions/{hash}"
         copyKeys={["hash", "methodId", "sender"]}
+        columnRenderers={{ status: statusRenderer }}
       />
     </DetailsLayout>
   );
