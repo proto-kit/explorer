@@ -9,6 +9,7 @@ import useQueryParams from "@/hooks/use-query-params";
 import DataTable from "@/components/ui/DataTable";
 import { FilterFieldDef } from "@/components/ui/FilterBuilder";
 import configs from "@/config";
+import { TransactionHash } from "@/components/settlements/settlementsPageClient";
 import { showPerPage } from "@/components/pagination";
 import { buildWhere } from "@/lib/utils";
 
@@ -78,7 +79,7 @@ const graphqlQuery = `query GetBatches($take: Int!, $skip: Int!, $where: BatchWh
 export default function BatchesPageClient() {
   const [page, view, filters, setPage, setView, setFilters] = useQueryParams(
     columns,
-    querySchema
+    querySchema,
   );
 
   const [data, setData] = useState<TableItem[]>([]);
@@ -114,7 +115,7 @@ export default function BatchesPageClient() {
 
       setData(mappedItems);
       setTotalCount(
-        result.data?.aggregateBatch?._count?._all?.toString() || "0"
+        result.data?.aggregateBatch?._count?._all?.toString() || "0",
       );
       setLoading(false);
     } catch (error) {
@@ -146,6 +147,13 @@ export default function BatchesPageClient() {
       onViewChange={setView}
       navigationPath="/batches/{height}"
       copyKeys={["settlementTransactionHash"]}
+      columnRenderers={{
+        settlementTransactionHash: (item) => (
+          <TransactionHash
+            transactionHash={String(item.settlementTransactionHash ?? "")}
+          />
+        ),
+      }}
     />
   );
 }

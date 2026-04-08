@@ -9,6 +9,7 @@ import Truncate from "react-truncate-inside/es";
 import { DetailsLayout } from "@/components/details/layout";
 import DataTable from "@/components/ui/DataTable";
 import config from "@/config";
+import { TransactionHash } from "@/components/settlements/settlementsPageClient";
 import { typed } from "@/lib/utils";
 import { columns, TableItem } from "@/components/batches/BatchesPageClient";
 
@@ -61,7 +62,7 @@ export default function SettlementDetail() {
     });
     try {
       const response = typed<GetSettlementQueryResponse>(
-        await responseData.json()
+        await responseData.json(),
       );
       setData(response.data);
       setLoading(false);
@@ -79,7 +80,9 @@ export default function SettlementDetail() {
   const details = [
     {
       label: "Transaction Hash",
-      value: data?.settlement?.transactionHash ?? "—",
+      value: (
+        <TransactionHash transactionHash={data?.settlement?.transactionHash} />
+      ),
     },
     {
       label: "Promised Messages Hash",
@@ -96,7 +99,7 @@ export default function SettlementDetail() {
       height: item.height,
       settlementTransactionHash: item.settlementTransactionHash,
       blocks: item._count?.blocks?.toString(),
-    })
+    }),
   );
 
   return (
@@ -124,6 +127,13 @@ export default function SettlementDetail() {
         loading={loading}
         navigationPath="/batches/{height}"
         copyKeys={["settlementTransactionHash"]}
+        columnRenderers={{
+          settlementTransactionHash: (item) => (
+            <TransactionHash
+              transactionHash={String(item.settlementTransactionHash ?? "")}
+            />
+          ),
+        }}
       />
     </DetailsLayout>
   );
