@@ -14,6 +14,7 @@ export interface DetailsLayoutProps {
     label: string;
     value: string | JSX.Element;
     link?: string;
+    fullWidth?: boolean;
   }[];
   loading: boolean;
 }
@@ -39,7 +40,7 @@ export function DetailsLayout({
         {/* Details */}
         <div className="flex justify-start w-full mb-2 mt-6 flex-wrap">
           {details.map((detail, i) => (
-            <div className="min-w-[50px] mr-12 mb-6" key={detail.label}>
+            <div className={cn("min-w-[50px] mr-12 mb-6", { "w-full mr-0": detail.fullWidth })} key={detail.label}>
               <Link
                 href={detail.link ?? ""}
                 className={cn({
