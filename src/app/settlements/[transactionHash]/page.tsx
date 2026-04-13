@@ -4,6 +4,7 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import Truncate from "react-truncate-inside/es";
 
 import { DetailsLayout } from "@/components/details/layout";
@@ -19,12 +20,14 @@ export interface GetSettlementQueryResponse {
           batches: {
             height: string;
             settlementTransactionHash: string;
+            createdAt: string;
             _count: {
               blocks: number;
             };
           }[];
           transactionHash: string;
           promisedMessagesHash: string;
+          createdAt: string;
         }
       | undefined;
   };
@@ -42,10 +45,12 @@ export default function SettlementDetail() {
         batches {
           height
           settlementTransactionHash
+          createdAt
           _count { blocks }
         }
         transactionHash
         promisedMessagesHash
+        createdAt
       }
     }`;
 
@@ -61,7 +66,7 @@ export default function SettlementDetail() {
     });
     try {
       const response = typed<GetSettlementQueryResponse>(
-        await responseData.json()
+        await responseData.json(),
       );
       setData(response.data);
       setLoading(false);
@@ -89,6 +94,14 @@ export default function SettlementDetail() {
       label: "Batches",
       value: `${data?.settlement?.batches?.length ?? "—"}`,
     },
+    {
+      label: "Created At",
+      value: data?.settlement?.createdAt ? (
+        <TimeAgo date={data.settlement.createdAt} minPeriod={30} />
+      ) : (
+        "—"
+      ),
+    },
   ];
 
   const batches: TableItem[] = (data?.settlement?.batches || []).map(
@@ -96,7 +109,8 @@ export default function SettlementDetail() {
       height: item.height,
       settlementTransactionHash: item.settlementTransactionHash,
       blocks: item._count?.blocks?.toString(),
-    })
+      createdAt: item.createdAt,
+    }),
   );
 
   return (
@@ -124,6 +138,9 @@ export default function SettlementDetail() {
         loading={loading}
         navigationPath="/batches/{height}"
         copyKeys={["settlementTransactionHash"]}
+        columnRenderers={{
+          createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
+        }}
       />
     </DetailsLayout>
   );

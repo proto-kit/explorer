@@ -3,6 +3,7 @@
 import { CircleCheck, CircleX } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import TimeAgo from "react-timeago";
 import Truncate from "react-truncate-inside/es";
 
 import { DetailsLayout } from "@/components/details/layout";
@@ -13,6 +14,7 @@ interface Transaction {
   sender: string;
   methodId: string;
   nonce: string;
+  createdAt: string;
   executionResult: {
     status: boolean;
     statusMessage?: string;
@@ -44,6 +46,7 @@ export default function BlockDetail() {
         methodId
         sender
         nonce
+        createdAt
         executionResult {
           status
           statusMessage
@@ -130,6 +133,12 @@ export default function BlockDetail() {
     {
       label: "Sender",
       value: data?.transaction?.sender ?? "—",
+    },
+    {
+      label: "Created At",
+      value: data?.transaction?.createdAt
+        ? <TimeAgo date={data.transaction.createdAt} minPeriod={30} />
+        : "—",
     },
   ];
 

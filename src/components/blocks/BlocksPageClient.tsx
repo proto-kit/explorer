@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import { z } from "zod";
 
 import DataTable from "@/components/ui/DataTable";
@@ -16,6 +17,7 @@ export interface TableItem {
   hash: string;
   transactions: string;
   stateRoot: string;
+  createdAt: string;
 }
 
 export interface GetBlocksQueryResponse {
@@ -23,6 +25,7 @@ export interface GetBlocksQueryResponse {
     blocks: {
       height: string;
       hash: string;
+      createdAt: string;
       result: {
         stateRoot: string;
       };
@@ -43,6 +46,7 @@ export const columns: Record<keyof TableItem, string> = {
   hash: "Hash",
   transactions: "Transactions",
   stateRoot: "State Root",
+  createdAt: "Created At",
 };
 
 const formSchema = z.object({
@@ -83,6 +87,7 @@ const graphqlQuery = `query GetBlocks($take: Int!, $skip: Int!, $where: BlockWhe
   blocks(take: $take, skip: $skip, orderBy: {height: desc}, where: $where) {
     height
     hash
+    createdAt
     result { stateRoot }
     _count { transactions }
   }
@@ -91,7 +96,7 @@ const graphqlQuery = `query GetBlocks($take: Int!, $skip: Int!, $where: BlockWhe
 
 const queryTransformer = (
   filters: Record<string, unknown>,
-  schema: Record<string, "string" | "boolean" | "number">
+  schema: Record<string, "string" | "boolean" | "number">,
 ) => {
   const where: Record<string, unknown> = {};
   Object.entries(filters).forEach(([key, value]) => {
@@ -123,7 +128,7 @@ const queryTransformer = (
 export default function BlocksPageClient() {
   const [page, view, filters, setPage, setView, setFilters] = useQueryParams(
     columns,
-    querySchema
+    querySchema,
   );
   const [data, setData] = useState<TableItem[]>([]);
   const [totalCount, setTotalCount] = useState("0");
@@ -156,11 +161,12 @@ export default function BlocksPageClient() {
         hash: item.hash,
         transactions: item._count?.transactions?.toString(),
         stateRoot: item.result.stateRoot,
+        createdAt: item.createdAt,
       }));
 
       setData(mappedItems);
       setTotalCount(
-        result.data?.aggregateBlock?._count?._all?.toString() || "0"
+        result.data?.aggregateBlock?._count?._all?.toString() || "0",
       );
       setLoading(false);
     } catch (error) {
@@ -191,6 +197,9 @@ export default function BlocksPageClient() {
       onViewChange={setView}
       navigationPath="/blocks/{hash}"
       copyKeys={["hash", "stateRoot"]}
+      columnRenderers={{
+        createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
+      }}
     />
   );
 }

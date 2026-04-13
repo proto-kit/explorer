@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import { z } from "zod";
 import { CircleCheck, CircleX } from "lucide-react";
 
@@ -20,6 +21,7 @@ export interface GetTransactionsQueryResponse {
       sender: string;
       methodId: string;
       nonce: string;
+      createdAt: string;
       executionResult: {
         status: boolean;
         statusMessage?: string;
@@ -38,6 +40,7 @@ export interface TableItem {
   methodId: string;
   sender: string;
   nonce: string;
+  createdAt: string;
   status: { isSuccess: boolean; message?: string };
 }
 
@@ -46,6 +49,7 @@ export const columns: Record<keyof TableItem, string> = {
   methodId: "Method ID",
   sender: "Sender",
   nonce: "Nonce",
+  createdAt: "Created At",
   status: "Status",
 };
 
@@ -83,11 +87,12 @@ const fields: FilterFieldDef[] = [
 ];
 
 const graphqlQuery = `query GetTransactions($take: Int!, $skip: Int!, $where: TransactionWhereInput) {
-  transactions(take: $take, skip: $skip, where: $where) {
+  transactions(take: $take, skip: $skip, orderBy: { createdAt: desc }, where: $where) {
     methodId
     hash
     nonce
     sender
+    createdAt
     executionResult {
       status
       statusMessage
@@ -116,6 +121,7 @@ const statusRenderer = (item: TableItem) => {
     </div>
   );
 };
+
 export default function TransactionsPageClient() {
   const [page, view, filters, setPage, setView, setFilters] = useQueryParams(
     columns,
@@ -160,6 +166,7 @@ export default function TransactionsPageClient() {
           methodId: item.methodId,
           sender: item.sender,
           nonce: item.nonce,
+          createdAt: item.createdAt,
           status: statusDisplay,
         };
       });
@@ -196,7 +203,7 @@ export default function TransactionsPageClient() {
       onViewChange={setView}
       navigationPath="/transactions/{hash}"
       copyKeys={["hash", "sender", "methodId"]}
-      columnRenderers={{ status: statusRenderer }}
+      columnRenderers={{ status: statusRenderer, createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} /> }}
     />
   );
 }
