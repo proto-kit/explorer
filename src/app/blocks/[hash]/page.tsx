@@ -30,7 +30,6 @@ export interface GetBlockQueryResponse {
               sender: string;
               methodId: string;
               nonce: string;
-              createdAt: string;
             };
             status: boolean;
             statusMessage?: string;
@@ -55,7 +54,7 @@ export default function BlockDetail() {
         createdAt
         result { stateRoot }
         transactions {
-          tx { hash, methodId, sender, nonce, createdAt }
+          tx { hash, methodId, sender, nonce }
           status
           statusMessage
         }
@@ -105,7 +104,7 @@ export default function BlockDetail() {
       value: data?.block?.result.stateRoot ?? "—",
     },
     {
-      label: "Created At",
+      label: "Created",
       value: data?.block?.createdAt ? (
         <TimeAgo date={data.block.createdAt} minPeriod={30} />
       ) : (
@@ -117,6 +116,7 @@ export default function BlockDetail() {
   const transactions: TableItem[] = (data?.block?.transactions || []).map(
     (tx) => ({
       ...tx.tx,
+      createdAt: data?.block?.createdAt || "",
       status: {
         isSuccess: tx.status === true,
         message: tx.statusMessage,

@@ -14,11 +14,11 @@ interface Transaction {
   sender: string;
   methodId: string;
   nonce: string;
-  createdAt: string;
   executionResult: {
     status: boolean;
     statusMessage?: string;
     block: {
+      createdAt: string;
       batch: {
         proof: string | null;
         settlementTransactionHash: string | null;
@@ -34,7 +34,7 @@ export interface GetTransactionQueryResponse {
   };
 }
 
-export default function BlockDetail() {
+export default function TransactionDetail() {
   const params = useParams<{ hash: string }>();
   const [data, setData] = useState<GetTransactionQueryResponse["data"]>();
   const [loading, setLoading] = useState(true);
@@ -46,11 +46,10 @@ export default function BlockDetail() {
         methodId
         sender
         nonce
-        createdAt
         executionResult {
           status
           statusMessage
-          block { batch { proof settlementTransactionHash } }
+          block { createdAt batch { proof settlementTransactionHash } }
         }
       }
     }`;
@@ -135,9 +134,9 @@ export default function BlockDetail() {
       value: data?.transaction?.sender ?? "—",
     },
     {
-      label: "Created At",
-      value: data?.transaction?.createdAt
-        ? <TimeAgo date={data.transaction.createdAt} minPeriod={30} />
+      label: "Created",
+      value: data?.transaction?.executionResult?.block?.createdAt
+        ? <TimeAgo date={data.transaction.executionResult.block.createdAt} minPeriod={30} />
         : "—",
     },
   ];

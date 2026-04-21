@@ -96,7 +96,7 @@ export default function BatchDetail() {
       value: `${data?.batch?.blocks?.length ?? "—"}`,
     },
     {
-      label: "Created At",
+      label: "Created",
       value: data?.batch?.createdAt
         ? <TimeAgo date={data.batch.createdAt} minPeriod={30} />
         : "—",
