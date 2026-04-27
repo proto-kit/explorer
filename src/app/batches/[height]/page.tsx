@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DetailsLayout } from "@/components/details/layout";
 import DataTable from "@/components/ui/DataTable";
 import config from "@/config";
+import { TransactionHash } from "@/components/settlements/settlementsPageClient";
 import { typed } from "@/lib/utils";
 import { columns, TableItem } from "@/components/blocks/BlocksPageClient";
 
@@ -84,7 +85,11 @@ export default function BatchDetail() {
     },
     {
       label: "Settlement Transaction Hash",
-      value: data?.batch?.settlementTransactionHash ?? "—",
+      value: (
+        <TransactionHash
+          transactionHash={data?.batch?.settlementTransactionHash}
+        />
+      ),
     },
     {
       label: "Blocks",
