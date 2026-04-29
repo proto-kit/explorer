@@ -107,7 +107,7 @@ const graphqlQuery = `query GetTransactions($take: Int!, $skip: Int!, $where: Tr
   }
 }`;
 
-const statusRenderer = (item: TableItem) => {
+export const statusRenderer = (item: TableItem) => {
   const { isSuccess, message } = item.status;
 
   return (
@@ -129,7 +129,7 @@ const statusRenderer = (item: TableItem) => {
 export default function TransactionsPageClient() {
   const [page, view, filters, setPage, setView, setFilters] = useQueryParams(
     columns,
-    querySchema
+    querySchema,
   );
   const [data, setData] = useState<TableItem[]>([]);
   const [totalCount, setTotalCount] = useState("0");
@@ -177,7 +177,7 @@ export default function TransactionsPageClient() {
 
       setData(mappedItems);
       setTotalCount(
-        result.data?.aggregateTransaction?._count?._all?.toString() || "0"
+        result.data?.aggregateTransaction?._count?._all?.toString() || "0",
       );
       setLoading(false);
     } catch (error) {

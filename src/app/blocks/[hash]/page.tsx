@@ -11,6 +11,7 @@ import config from "@/config";
 import { typed } from "@/lib/utils";
 import {
   columns,
+  statusRenderer,
   TableItem,
 } from "@/components/transactions/TransactionsPageClient";
 
