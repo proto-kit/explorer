@@ -43,7 +43,7 @@ export const columns: Record<keyof TableItem, string> = {
   height: "Height",
   blocks: "Blocks",
   settlementTransactionHash: "Settlement Transaction Hash",
-  createdAt: "Created At",
+  createdAt: "Created",
 };
 
 const formSchema = z.object({

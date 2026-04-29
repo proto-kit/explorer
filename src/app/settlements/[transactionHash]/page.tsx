@@ -98,7 +98,7 @@ export default function SettlementDetail() {
       value: `${data?.settlement?.batches?.length ?? "—"}`,
     },
     {
-      label: "Created At",
+      label: "Created",
       value: data?.settlement?.createdAt ? (
         <TimeAgo date={data.settlement.createdAt} minPeriod={30} />
       ) : (

@@ -44,7 +44,7 @@ export const columns: Record<keyof TableItem, string> = {
   transactionHash: "Transaction Hash",
   promisedMessagesHash: "Promised Messages Hash",
   batches: "Batches",
-  createdAt: "Created At",
+  createdAt: "Created",
 };
 
 export function TransactionHash(props: { transactionHash?: string | null }) {

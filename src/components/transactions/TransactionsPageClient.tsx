@@ -21,10 +21,12 @@ export interface GetTransactionsQueryResponse {
       sender: string;
       methodId: string;
       nonce: string;
-      createdAt: string;
       executionResult: {
         status: boolean;
         statusMessage?: string;
+        block: {
+          createdAt: string;
+        };
       };
     }[];
     aggregateTransaction: {
@@ -49,7 +51,7 @@ export const columns: Record<keyof TableItem, string> = {
   methodId: "Method ID",
   sender: "Sender",
   nonce: "Nonce",
-  createdAt: "Created At",
+  createdAt: "Created",
   status: "Status",
 };
 
@@ -87,15 +89,17 @@ const fields: FilterFieldDef[] = [
 ];
 
 const graphqlQuery = `query GetTransactions($take: Int!, $skip: Int!, $where: TransactionWhereInput) {
-  transactions(take: $take, skip: $skip, orderBy: { createdAt: desc }, where: $where) {
+  transactions(take: $take, skip: $skip, orderBy: { executionResult: { block: { createdAt: desc } } }, where: $where) {
     methodId
     hash
     nonce
     sender
-    createdAt
     executionResult {
       status
       statusMessage
+      block {
+        createdAt
+      }
     }
   }
   aggregateTransaction(where: $where) {
@@ -166,7 +170,7 @@ export default function TransactionsPageClient() {
           methodId: item.methodId,
           sender: item.sender,
           nonce: item.nonce,
-          createdAt: item.createdAt,
+          createdAt: item.executionResult?.block?.createdAt || "-",
           status: statusDisplay,
         };
       });

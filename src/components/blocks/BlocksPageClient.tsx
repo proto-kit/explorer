@@ -46,7 +46,7 @@ export const columns: Record<keyof TableItem, string> = {
   hash: "Hash",
   transactions: "Transactions",
   stateRoot: "State Root",
-  createdAt: "Created At",
+  createdAt: "Created",
 };
 
 const formSchema = z.object({
