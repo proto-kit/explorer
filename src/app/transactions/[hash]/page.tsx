@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import TimeAgo from "react-timeago";
@@ -14,6 +14,7 @@ interface Transaction {
   sender: string;
   methodId: string;
   nonce: string;
+  argsFields: string[];
   executionResult: {
     status: boolean;
     statusMessage?: string;
@@ -38,6 +39,7 @@ export default function TransactionDetail() {
   const params = useParams<{ hash: string }>();
   const [data, setData] = useState<GetTransactionQueryResponse["data"]>();
   const [loading, setLoading] = useState(true);
+  const [argsExpanded, setArgsExpanded] = useState(false);
   const query = useCallback(async () => {
     setLoading(true);
     const queryStr = `query GetTransaction($hash: String!) {
@@ -46,6 +48,7 @@ export default function TransactionDetail() {
         methodId
         sender
         nonce
+        argsFields
         executionResult {
           status
           statusMessage
@@ -80,6 +83,38 @@ export default function TransactionDetail() {
   useEffect(() => {
     void query();
   }, []);
+
+  const ArgsFieldsDisplay = () => {
+    if (
+      !data?.transaction?.argsFields ||
+      data.transaction.argsFields.length === 0
+    ) {
+      return "—";
+    }
+
+    return (
+      <div className="w-full space-y-2\">
+        <button
+          onClick={() => setArgsExpanded(!argsExpanded)}
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronDown
+            className={`w-4 h-4 transition-transform ${
+              argsExpanded ? "rotate-180" : ""
+            }`}
+          />
+          <span className="font-mono text-xs">
+            {argsExpanded ? "Hide args" : "Show args"}
+          </span>
+        </button>
+        {argsExpanded && (
+          <pre className="text-xs bg-muted p-3 rounded overflow-auto max-h-64 font-mono border border-border w-full">
+            {JSON.stringify(data.transaction.argsFields, null, 2)}
+          </pre>
+        )}
+      </div>
+    );
+  };
 
   const getStatus = (tx: Transaction | undefined) => {
     const batch = tx?.executionResult?.block?.batch;
@@ -135,9 +170,19 @@ export default function TransactionDetail() {
     },
     {
       label: "Created",
-      value: data?.transaction?.executionResult?.block?.createdAt
-        ? <TimeAgo date={data.transaction.executionResult.block.createdAt} minPeriod={30} />
-        : "—",
+      value: data?.transaction?.executionResult?.block?.createdAt ? (
+        <TimeAgo
+          date={data.transaction.executionResult.block.createdAt}
+          minPeriod={30}
+        />
+      ) : (
+        "—"
+      ),
+    },
+    {
+      label: "Args Fields",
+      value: <ArgsFieldsDisplay />,
+      fullWidth: true,
     },
   ];
 
