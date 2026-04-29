@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import { z } from "zod";
 
 import useQueryParams from "@/hooks/use-query-params";
@@ -17,6 +18,7 @@ export interface TableItem {
   height: string;
   blocks: string;
   settlementTransactionHash: string;
+  createdAt: string;
 }
 
 export interface GetBatchesQueryResponse {
@@ -24,6 +26,7 @@ export interface GetBatchesQueryResponse {
     batches: {
       height: string;
       settlementTransactionHash: string;
+      createdAt: string;
       _count: {
         blocks: number;
       };
@@ -40,6 +43,7 @@ export const columns: Record<keyof TableItem, string> = {
   height: "Height",
   blocks: "Blocks",
   settlementTransactionHash: "Settlement Transaction Hash",
+  createdAt: "Created",
 };
 
 const formSchema = z.object({
@@ -71,6 +75,7 @@ const graphqlQuery = `query GetBatches($take: Int!, $skip: Int!, $where: BatchWh
   batches(take: $take, skip: $skip, orderBy: {height: desc}, where: $where) {
     settlementTransactionHash
     height
+    createdAt
     _count { blocks }
   }
   aggregateBatch(where: $where) { _count { _all } }
@@ -111,6 +116,7 @@ export default function BatchesPageClient() {
         height: item.height,
         settlementTransactionHash: item.settlementTransactionHash,
         blocks: item._count?.blocks?.toString() || "0",
+        createdAt: item.createdAt,
       }));
 
       setData(mappedItems);
@@ -148,6 +154,7 @@ export default function BatchesPageClient() {
       navigationPath="/batches/{height}"
       copyKeys={["settlementTransactionHash"]}
       columnRenderers={{
+        createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
         settlementTransactionHash: (item) => (
           <TransactionHash
             transactionHash={String(item.settlementTransactionHash ?? "")}

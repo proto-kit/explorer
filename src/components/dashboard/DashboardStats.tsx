@@ -141,7 +141,7 @@ export default function DashboardStats() {
           height
           hash
         }
-        settlements(take: 1, orderBy: { transactionHash: desc }) {
+        settlements(take: 1, orderBy: { createdAt: desc }) {
           transactionHash
           promisedMessagesHash
         }

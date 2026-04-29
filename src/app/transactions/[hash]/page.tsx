@@ -3,6 +3,7 @@
 import { CircleCheck, CircleX } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import TimeAgo from "react-timeago";
 import Truncate from "react-truncate-inside/es";
 
 import { DetailsLayout } from "@/components/details/layout";
@@ -17,6 +18,7 @@ interface Transaction {
     status: boolean;
     statusMessage?: string;
     block: {
+      createdAt: string;
       batch: {
         proof: string | null;
         settlementTransactionHash: string | null;
@@ -32,7 +34,7 @@ export interface GetTransactionQueryResponse {
   };
 }
 
-export default function BlockDetail() {
+export default function TransactionDetail() {
   const params = useParams<{ hash: string }>();
   const [data, setData] = useState<GetTransactionQueryResponse["data"]>();
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export default function BlockDetail() {
         executionResult {
           status
           statusMessage
-          block { batch { proof settlementTransactionHash } }
+          block { createdAt batch { proof settlementTransactionHash } }
         }
       }
     }`;
@@ -130,6 +132,12 @@ export default function BlockDetail() {
     {
       label: "Sender",
       value: data?.transaction?.sender ?? "—",
+    },
+    {
+      label: "Created",
+      value: data?.transaction?.executionResult?.block?.createdAt
+        ? <TimeAgo date={data.transaction.executionResult.block.createdAt} minPeriod={30} />
+        : "—",
     },
   ];
 

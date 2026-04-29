@@ -2,6 +2,8 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
+import { CircleCheck, CircleX } from "lucide-react";
 
 import { DetailsLayout } from "@/components/details/layout";
 import DataTable from "@/components/ui/DataTable";
@@ -19,6 +21,7 @@ export interface GetBlockQueryResponse {
       | {
           hash: string;
           height: string;
+          createdAt: string;
           result: {
             stateRoot: string;
           };
@@ -49,6 +52,7 @@ export default function BlockDetail() {
       block(where: { hash: $hash }) {
         height
         hash
+        createdAt
         result { stateRoot }
         transactions {
           tx { hash, methodId, sender, nonce }
@@ -100,17 +104,47 @@ export default function BlockDetail() {
       label: "StateRoot",
       value: data?.block?.result.stateRoot ?? "—",
     },
+    {
+      label: "Created",
+      value: data?.block?.createdAt ? (
+        <TimeAgo date={data.block.createdAt} minPeriod={30} />
+      ) : (
+        "—"
+      ),
+    },
   ];
 
   const transactions: TableItem[] = (data?.block?.transactions || []).map(
     (tx) => ({
       ...tx.tx,
+      createdAt: data?.block?.createdAt || "",
       status: {
         isSuccess: tx.status === true,
         message: tx.statusMessage,
       },
     }),
   );
+
+  const statusRenderer = (item: TableItem) => {
+    const { isSuccess, message } = item.status;
+
+    return (
+      <div className="flex flex-col items-center justify-center w-full gap-1">
+        {isSuccess === true ? (
+          <CircleCheck className="w-4 h-4 text-green-500" />
+        ) : (
+          <>
+            <CircleX className="w-4 h-4 text-red-500" />
+            {message !== undefined && (
+              <span className="text-xs text-red-600 text-center">
+                {message}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <DetailsLayout
@@ -131,7 +165,10 @@ export default function BlockDetail() {
         loading={loading}
         navigationPath="/transactions/{hash}"
         copyKeys={["hash", "methodId", "sender"]}
-        columnRenderers={{ status: statusRenderer }}
+        columnRenderers={{
+          createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
+          status: statusRenderer,
+        }}
       />
     </DetailsLayout>
   );

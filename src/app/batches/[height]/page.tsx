@@ -4,6 +4,7 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 
 import { DetailsLayout } from "@/components/details/layout";
 import DataTable from "@/components/ui/DataTable";
@@ -19,6 +20,7 @@ export interface GetBatchQueryResponse {
           blocks: {
             height: string;
             hash: string;
+            createdAt: string;
             result: {
               stateRoot: string;
             };
@@ -28,6 +30,7 @@ export interface GetBatchQueryResponse {
           }[];
           settlementTransactionHash: string;
           height: string;
+          createdAt: string;
         }
       | undefined;
   };
@@ -44,9 +47,11 @@ export default function BatchDetail() {
       batch(where: { height: $height }) {
         height
         settlementTransactionHash
+        createdAt
         blocks {
           height
           hash
+          createdAt
           result { stateRoot }
           _count { transactions }
         }
@@ -95,6 +100,12 @@ export default function BatchDetail() {
       label: "Blocks",
       value: `${data?.batch?.blocks?.length ?? "—"}`,
     },
+    {
+      label: "Created",
+      value: data?.batch?.createdAt
+        ? <TimeAgo date={data.batch.createdAt} minPeriod={30} />
+        : "—",
+    },
   ];
 
   const blocks: TableItem[] = (data?.batch?.blocks || []).map((item) => ({
@@ -102,6 +113,7 @@ export default function BatchDetail() {
     hash: item.hash,
     transactions: item._count?.transactions?.toString(),
     stateRoot: item.result?.stateRoot,
+    createdAt: item.createdAt,
   }));
 
   return (
@@ -123,6 +135,7 @@ export default function BatchDetail() {
         loading={loading}
         navigationPath="/blocks/{hash}"
         copyKeys={["hash", "stateRoot"]}
+        columnRenderers={{ createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} /> }}
       />
     </DetailsLayout>
   );

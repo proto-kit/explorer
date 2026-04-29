@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import { z } from "zod";
 
 import DataTable from "@/components/ui/DataTable";
@@ -18,6 +19,7 @@ export interface TableItem {
   transactionHash: string;
   promisedMessagesHash: string;
   batches: string;
+  createdAt: string;
 }
 
 export interface GetSettlementsQueryResponse {
@@ -25,6 +27,7 @@ export interface GetSettlementsQueryResponse {
     settlements: {
       transactionHash: string;
       promisedMessagesHash: string;
+      createdAt: string;
       _count: {
         batches: number;
       };
@@ -41,6 +44,7 @@ export const columns: Record<keyof TableItem, string> = {
   transactionHash: "Transaction Hash",
   promisedMessagesHash: "Promised Messages Hash",
   batches: "Batches",
+  createdAt: "Created",
 };
 
 export function TransactionHash(props: { transactionHash?: string | null }) {
@@ -80,9 +84,10 @@ const fields: FilterFieldDef[] = [
 ];
 
 const graphqlQuery = `query GetSettlements($take: Int!, $skip: Int!, $where: SettlementWhereInput) {
-  settlements(take: $take, skip: $skip, where: $where) {
+  settlements(take: $take, skip: $skip, orderBy: { createdAt: desc }, where: $where) {
     transactionHash
     promisedMessagesHash
+    createdAt
     _count { batches }
   }
   aggregateSettlement(where: $where) { _count { _all } }
@@ -125,6 +130,7 @@ export default function SettlementsPageClient() {
         transactionHash: item.transactionHash,
         promisedMessagesHash: item.promisedMessagesHash,
         batches: item._count?.batches?.toString() || "0",
+        createdAt: item.createdAt,
       }));
 
       setData(mappedItems);
@@ -167,6 +173,7 @@ export default function SettlementsPageClient() {
             transactionHash={String(item.transactionHash ?? "")}
           />
         ),
+        createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
       }}
     />
   );
