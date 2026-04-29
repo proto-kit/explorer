@@ -10,6 +10,7 @@ import useQueryParams from "@/hooks/use-query-params";
 import DataTable from "@/components/ui/DataTable";
 import { FilterFieldDef } from "@/components/ui/FilterBuilder";
 import configs from "@/config";
+import { TransactionHash } from "@/components/settlements/settlementsPageClient";
 import { showPerPage } from "@/components/pagination";
 import { buildWhere } from "@/lib/utils";
 
@@ -154,6 +155,11 @@ export default function BatchesPageClient() {
       copyKeys={["settlementTransactionHash"]}
       columnRenderers={{
         createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
+        settlementTransactionHash: (item) => (
+          <TransactionHash
+            transactionHash={String(item.settlementTransactionHash ?? "")}
+          />
+        ),
       }}
     />
   );

@@ -42,7 +42,11 @@ export default function GenericTableRow<Item>({
                 columnRenderers && _key in columnRenderers ? (
                   columnRenderers[typed<keyof Item>(_key)]?.(item)
                 ) : copyKeys.includes(_key) ? (
-                  <Copy text={String(item[typed<keyof Item>(_key)])} />
+                  item[typed<keyof Item>(_key)] != null ? (
+                    <Copy text={String(item[typed<keyof Item>(_key)])} />
+                  ) : (
+                    <>-</>
+                  )
                 ) : (
                   <>{String(item[typed<keyof Item>(_key)])}</>
                 )
@@ -50,7 +54,7 @@ export default function GenericTableRow<Item>({
                 <Skeleton className="h-5" />
               )}
             </TableCell>
-          )
+          ),
       )}
 
       {!loading && (

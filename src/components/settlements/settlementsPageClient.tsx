@@ -8,6 +8,8 @@ import { z } from "zod";
 
 import DataTable from "@/components/ui/DataTable";
 import { FilterFieldDef } from "@/components/ui/FilterBuilder";
+import Copy from "@/components/ui/copy-to-clipboard";
+import MinaExplorerLink from "@/components/ui/minaExplorerLink";
 import useQueryParams from "@/hooks/use-query-params";
 import configs from "@/config";
 import { showPerPage } from "@/components/pagination";
@@ -44,6 +46,17 @@ export const columns: Record<keyof TableItem, string> = {
   batches: "Batches",
   createdAt: "Created At",
 };
+
+export function TransactionHash(props: { transactionHash?: string | null }) {
+  const hash = String(props.transactionHash ?? "");
+
+  return (
+    <div className="flex items-center gap-2">
+      <Copy text={hash} />
+      <MinaExplorerLink hash={hash} />
+    </div>
+  );
+}
 
 const formSchema = z.object({
   transactionHash: z.string().optional(),
@@ -83,7 +96,7 @@ const graphqlQuery = `query GetSettlements($take: Int!, $skip: Int!, $where: Set
 export default function SettlementsPageClient() {
   const [page, view, filters, setPage, setView, setFilters] = useQueryParams(
     columns,
-    querySchema
+    querySchema,
   );
 
   const [data, setData] = useState<TableItem[]>([]);
@@ -122,7 +135,7 @@ export default function SettlementsPageClient() {
 
       setData(mappedItems);
       setTotalCount(
-        result.data?.aggregateSettlement?._count?._all?.toString() || "0"
+        result.data?.aggregateSettlement?._count?._all?.toString() || "0",
       );
       setLoading(false);
     } catch (error) {
@@ -153,8 +166,15 @@ export default function SettlementsPageClient() {
       onPageChange={setPage}
       onViewChange={setView}
       navigationPath="/settlements/{transactionHash}"
-      copyKeys={["transactionHash", "promisedMessagesHash"]}
-      columnRenderers={{ createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} /> }}
+      copyKeys={["promisedMessagesHash"]}
+      columnRenderers={{
+        transactionHash: (item) => (
+          <TransactionHash
+            transactionHash={String(item.transactionHash ?? "")}
+          />
+        ),
+        createdAt: (item) => <TimeAgo date={item.createdAt} minPeriod={30} />,
+      }}
     />
   );
 }
